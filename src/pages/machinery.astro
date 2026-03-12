@@ -1,0 +1,15 @@
+---
+import MachineryGrid from "../components/MachineryGrid.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+const title = "Machinery";
+---
+<MainLayout title={title}>
+  <main class="py-8">
+    <div class="max-w-7xl mx-auto px-6">
+      <h1 class="text-3xl font-semibold text-white mb-6">Machinery</h1>
+    </div>
+
+    <!-- show catalog-only (no full-screen tabs) -->
+    <MachineryGrid catalogOnly={true} />
+  </main>
+</MainLayout>

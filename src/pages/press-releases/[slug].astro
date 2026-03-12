@@ -1,0 +1,35 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const releases = (await getCollection('press-releases'))
+    .filter((release) => /^\d+\.md$/.test(release.id));
+  return releases.map((release) => ({
+    params: { slug: release.id.replace(/\.md$/, '') },
+    props: { release },
+  }));
+}
+
+const { release } = Astro.props;
+const { Content } = await release.render();
+---
+
+<MainLayout>
+  <main class="bg-gray-900 text-white max-w-4xl mx-auto px-4 sm:px-6 py-6">
+    <a href="/press-releases" class="text-sm text-indigo-300 hover:underline">← Back to press releases</a>
+
+    <article class="mt-4">
+      <h1 class="text-3xl sm:text-4xl font-bold leading-tight">{release.data.title}</h1>
+      <p class="mt-2 text-sm text-gray-400">{release.data.publishDate.toLocaleDateString()}</p>
+
+      {release.data.cardImage && (
+        <img src={release.data.cardImage} alt={release.data.title} class="mt-5 w-full h-auto rounded-lg object-cover" loading="lazy" />
+      )}
+
+      <div class="prose prose-invert max-w-none mt-6">
+        <Content />
+      </div>
+    </article>
+  </main>
+</MainLayout>

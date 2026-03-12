@@ -1,0 +1,19 @@
+---
+import '../styles/global.css';
+export let title = 'Site';
+---
+<html lang="en" class="theme">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <!-- ...existing head content... -->
+    <!-- preconnect fonts for faster load -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- keep font loads in theme.css (import) -->
+  </head>
+  <body class="bg-theme text-theme antialiased">
+    <slot />
+    <!-- ...existing scripts/footer... -->
+  </body>
+</html>

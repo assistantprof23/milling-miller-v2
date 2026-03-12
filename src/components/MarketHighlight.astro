@@ -1,0 +1,25 @@
+---
+const { posts } = Astro.props ?? {};
+import { newsPosts } from '../data/news.js';
+import styles from '../styles/Home.module.css';
+
+const latest = (posts && posts.length) ? posts.slice(0, 3) : newsPosts.slice(0, 3);
+---
+<section class={styles.marketInsightsSection}>
+  <h2>Market Insights</h2>
+
+  <div class={styles.marketGrid}>
+    {latest.map((post) => (
+      <a class={styles.marketCard} href={`/news/${post.slug}`} key={post.slug}>
+        <div
+          class={styles.cardImage}
+          style={`background-image: url('${post.image ?? '/default-image.jpg'}')`}
+        >
+          <div class={styles.cardOverlay}>
+            <h3 class={styles.cardTitle}>{post.title}</h3>
+          </div>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>

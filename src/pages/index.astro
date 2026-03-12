@@ -1,0 +1,37 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import Hero from "../components/Hero.astro";
+import CategoryHighlights from "../components/CategoryHighlights.astro";
+import MachineryGrid from "../components/MachineryGrid.astro";
+import PolicyTracker from "../components/PolicyTracker.astro";
+import EventsSection from "../components/EventsSection.astro";
+import PressReleasesSection from "../components/PressReleasesSection.astro";
+import AdBanner from "../components/AdBanner.astro";
+import ads from "../data/ads.json";
+const title = "Home";
+---
+
+<MainLayout title={title}>
+  <main>
+    <Hero />
+    <CategoryHighlights />
+    <section class="max-w-7xl mx-auto px-6 py-4">
+      <AdBanner
+        href={ads.homeSectionBreak1.href}
+        imageSrc={ads.homeSectionBreak1.imageSrc}
+        alt={ads.homeSectionBreak1.alt}
+      />
+    </section>
+    <MachineryGrid catalogOnly={true} />
+    <PolicyTracker />
+    <section class="max-w-7xl mx-auto px-6 py-2 pb-8">
+      <AdBanner
+        href={ads.homeSectionBreak2.href}
+        imageSrc={ads.homeSectionBreak2.imageSrc}
+        alt={ads.homeSectionBreak2.alt}
+      />
+    </section>
+    <PressReleasesSection />
+    <EventsSection />
+  </main>
+</MainLayout>

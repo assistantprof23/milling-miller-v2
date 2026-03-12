@@ -1,0 +1,41 @@
+---
+/* Import global styles once in the shared header so client-side navigation keeps styles loaded */
+import "../styles/global.css";
+import ads from "../data/ads.json";
+---
+
+<header id="site-header" class="site-header bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto p-3 sm:p-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <a href="/" aria-label="Milling & Millers homepage" class="inline-block">
+          <img src="/logo.png" alt="Milling & Millers" class="h-12 sm:h-20 md:h-24 cursor-pointer" />
+        </a>
+      </div>
+
+      <div class="flex items-center sm:justify-end">
+        <div class="bg-transparent rounded text-sm">
+          <a href={ads.header.href} target="_blank" rel="noopener noreferrer" aria-label={ads.header.alt}>
+            <img src={ads.header.imageSrc} alt={ads.header.alt} class="h-10 sm:h-14 md:h-20 max-w-[180px] sm:max-w-none object-contain" />
+          </a>
+        </div>
+      </div>
+      </div>
+
+      <nav aria-label="Primary navigation" class="mt-2 sm:mt-3 flex items-center gap-4 sm:gap-5 md:gap-6 font-medium text-sm sm:text-base overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:none] [-ms-overflow-style:none]">
+        <a href="/" class="hover:text-green-600">Home</a>
+        <a href="/news" class="hover:text-green-600">News</a>
+        <a href="/press-releases" class="hover:text-green-600">Press Releases</a>
+        <a href="/policies" class="hover:text-green-600">Policies</a>
+        <a href="/machinery" class="hover:text-green-600">Machinery</a>
+        <a href="/events" class="hover:text-green-600">Events</a>
+        <a href="/contact" class="hover:text-green-600">Contact</a>
+      </nav>
+    </div>
+
+  <style>
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  </header>

@@ -1,0 +1,102 @@
+---
+import { machineryItems } from "../data/machinery.js";
+const { catalogOnly = false } = Astro.props;
+const fallbackImage = "https://www.millingandmillers.com/wp-content/uploads/2023/05/Indiana-Automation-04.jpg";
+const dummyImage = fallbackImage;
+---
+<section class="bg-gray-900 py-12">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-3xl font-semibold text-white mb-6">Featured Machinery</h2>
+
+    <!-- Tabs (hidden when rendering catalog-only) -->
+    { !catalogOnly && (
+      <>
+      <div id="machinery-tabs" class="mb-6">
+        <div role="tablist" aria-label="Machinery categories" class="flex gap-2 bg-gray-800 p-1 rounded-md">
+          <button data-tab="rice" role="tab" aria-controls="panel-rice" id="tab-rice" class="tab-btn px-4 py-2 text-sm font-medium rounded-md text-white bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Rice Fortification</button>
+          <button data-tab="lab" role="tab" aria-controls="panel-lab" id="tab-lab" class="tab-btn px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">Lab Equipments</button>
+          <button data-tab="parboil" role="tab" aria-controls="panel-parboil" id="tab-parboil" class="tab-btn px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">Parboiling</button>
+        </div>
+      </div>
+
+      <div class="tab-panels mb-8">
+        <div data-panel="rice" id="panel-rice" aria-labelledby="tab-rice" class="tab-panel flex items-center justify-center">
+          { /* image constrained to half viewport height and kept whole */ }
+          <img src={dummyImage} alt="Rice Fortification" loading="lazy" class="w-full max-h-[50vh] object-contain rounded-md"/>
+        </div>
+
+        <div data-panel="lab" id="panel-lab" aria-labelledby="tab-lab" class="hidden tab-panel flex items-center justify-center">
+          <img src={dummyImage} alt="Lab Equipments" loading="lazy" class="w-full max-h-[50vh] object-contain rounded-md"/>
+        </div>
+
+        <div data-panel="parboil" id="panel-parboil" aria-labelledby="tab-parboil" class="hidden tab-panel flex items-center justify-center">
+          <img src={dummyImage} alt="Parboiling" loading="lazy" class="w-full max-h-[50vh] object-contain rounded-md"/>
+        </div>
+      </div>
+      </>
+    ) }
+
+    <!-- Catalog grid (same on homepage + machinery page) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {machineryItems.map((item) => (
+        <article class="bg-gray-800 border border-gray-700 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-transform duration-150 ease-out transform hover:-translate-y-1">
+          <div class="h-48 bg-gradient-to-b from-gray-800 to-gray-700 flex items-center justify-center overflow-hidden">
+            <img src={item.image || fallbackImage} alt={item.title} loading="lazy" class="w-full h-full object-cover opacity-95"/>
+          </div>
+
+          <div class="p-4">
+            <h3 class="text-lg font-medium text-white">{item.title}</h3>
+            <p class="mt-2 text-sm text-gray-300">{item.description} Available at {item.location}. Contact {item.contact}</p>
+
+            <div class="mt-4 flex items-center justify-between">
+              <div class="text-sm text-gray-400">{item.vendor}</div>
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold text-indigo-300">{item.price}</span>
+                <a class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400" href={item.link || '#'}>View</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const tabsRoot = document.getElementById('machinery-tabs');
+    if (!tabsRoot) return;
+    const tabs = tabsRoot.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    function activate(tabName) {
+      tabs.forEach(btn => {
+        const active = btn.dataset.tab === tabName;
+        btn.classList.toggle('bg-gray-700', active);
+        btn.classList.toggle('text-white', active);
+        btn.classList.toggle('text-gray-300', !active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        btn.setAttribute('tabindex', active ? '0' : '-1');
+      });
+      panels.forEach(p => {
+        p.classList.toggle('hidden', p.dataset.panel !== tabName);
+      });
+      const activePanel = document.querySelector('.tab-panel:not(.hidden)');
+      if (activePanel) activePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    tabs.forEach((btn, idx) => {
+      btn.addEventListener('click', () => activate(btn.dataset.tab));
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          const next = e.key === 'ArrowRight' ? (idx + 1) % tabs.length : (idx - 1 + tabs.length) % tabs.length;
+          tabs[next].focus();
+          activate(tabs[next].dataset.tab);
+        }
+      });
+    });
+
+    // default activate first tab
+    if (tabs.length) activate(tabs[0].dataset.tab);
+  })();
+</script>

@@ -1,0 +1,113 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import AdBanner from "../components/AdBanner.astro";
+import ads from "../data/ads.json";
+import { newsPosts } from "../data/news.js";
+
+const middleInsertIndex = Math.max(0, Math.floor(newsPosts.length / 2) - 1);
+---
+<MainLayout>
+  <main class="bg-gray-900 text-white max-w-3xl md:max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      <h1 class="text-3xl font-bold mb-4">News</h1>
+      
+      <!-- Filter Buttons -->
+      <div class="mb-6">
+        <!-- horizontal scroll on small screens, inline on larger -->
+        <div class="flex gap-2 sm:gap-3 overflow-x-auto pb-1 -mx-2 sm:mx-0 px-2 sm:px-0">
+          <button id="all" class="whitespace-nowrap bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">All</button>
+          <button id="rice" class="whitespace-nowrap bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">Rice</button>
+          <button id="wheat" class="whitespace-nowrap bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">Wheat</button>
+          <button id="biofuel" class="whitespace-nowrap bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">Biofuel</button>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <AdBanner
+          href={ads.newsTop.href}
+          imageSrc={ads.newsTop.imageSrc}
+          alt={ads.newsTop.alt}
+          containerClass="max-w-4xl"
+        />
+      </div>
+      
+      <!-- News Posts Container -->
+      <div id="news-container" class="columns-1 md:columns-2 lg:columns-3 gap-4">
+        {newsPosts.map((post, idx) => {
+          return (
+            <>
+              <a href={`/news/${post.slug}`} rel="noopener noreferrer" class="block mb-4 break-inside-avoid">
+                <article class="relative bg-gray-800 rounded shadow hover:bg-gray-700 transition overflow-hidden">
+                  {post.image && <img src={post.image} alt={post.title} class="w-full h-48 sm:h-56 object-cover" />}
+                  <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-2">{post.title}</h2>
+                    <span class="text-green-300 text-sm mt-2 block">Read More</span>
+                  </div>
+                </article>
+              </a>
+
+              {newsPosts.length >= 4 && idx === middleInsertIndex && (
+                <div class="block mb-4 break-inside-avoid">
+                  <AdBanner
+                    href={ads.newsMid.href}
+                    imageSrc={ads.newsMid.imageSrc}
+                    alt={ads.newsMid.alt}
+                  />
+                </div>
+              )}
+            </>
+          );
+        })}
+      </div>
+  </main>
+
+  <script define:vars={{ allPosts: newsPosts, newsMidAd: ads.newsMid }}>
+    // Client-side filtering
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('button[id]');
+      const container = document.getElementById('news-container');
+
+      function renderCardsWithMiddleAd(posts) {
+        const middleIndex = Math.max(0, Math.floor(posts.length / 2) - 1);
+        const insertMidAd = posts.length >= 4;
+
+        return posts.map((post, idx) => {
+          const card = `
+            <a href="/news/${post.slug}" rel="noopener noreferrer" class="block mb-4 break-inside-avoid">
+              <article class="relative bg-gray-800 rounded shadow hover:bg-gray-700 transition overflow-hidden">
+                ${post.image ? `<img src="${post.image}" alt="${post.title}" class="w-full h-48 sm:h-56 object-cover" />` : ''}
+                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4">
+                  <h2 class="text-lg sm:text-xl font-semibold mb-2">${post.title}</h2>
+                  <span class="text-green-300 text-sm mt-2 block">Read More</span>
+                </div>
+              </article>
+            </a>
+          `;
+
+          if (insertMidAd && idx === middleIndex) {
+            const ad = `
+              <div class="block mb-4 break-inside-avoid">
+                <div class="ad-banner">
+                  <span class="ad-label">Sponsored</span>
+                  <a href="${newsMidAd.href}" class="ad-link" target="_blank" rel="noopener noreferrer" aria-label="${newsMidAd.alt}">
+                    <img src="${newsMidAd.imageSrc}" alt="${newsMidAd.alt}" loading="lazy" class="ad-image" />
+                  </a>
+                </div>
+              </div>
+            `;
+            return card + ad;
+          }
+
+          return card;
+        }).join('');
+      }
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.id === 'all' ? null : btn.id.charAt(0).toUpperCase() + btn.id.slice(1);
+          const filtered = type ? allPosts.filter(p => p.type === type) : allPosts;
+          container.innerHTML = renderCardsWithMiddleAd(filtered);
+        });
+      });
+    });
+  </script>
+</MainLayout>

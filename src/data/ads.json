@@ -1,0 +1,36 @@
+{
+  "header": {
+    "href": "https://millingandmillers.com",
+    "imageSrc": "https://millingandmillers.com/wp-content/uploads/2023/05/Indiana-Automation-ad.jpg",
+    "alt": "Header sponsored machinery advertisement"
+  },
+  "hero": {
+    "href": "https://millingandmillers.com",
+    "imageSrc": "https://www.millingandmillers.com/wp-content/uploads/2026/03/WhatsApp-Image-2026-03-04-at-4.45.39-PM.jpeg",
+    "alt": "Hero sponsored machinery advertisement"
+  },
+  "homeSectionBreak1": {
+    "href": "https://millingandmillers.com",
+    "imageSrc": "https://www.millingandmillers.com/wp-content/uploads/2023/05/Heatflow-01.jpg",
+    "alt": "Sponsored machinery advertisement"
+  },
+  "homeSectionBreak2": {
+    "href": "https://millingandmillers.com",
+    "imageSrc": "https://www.millingandmillers.com/wp-content/uploads/2023/05/Airpower-1.jpg",
+    "alt": "Sponsored policy and events partner advertisement"
+  },
+  "newsTop": {
+    "href": "https://millingandmillers.com",
+    "imageSrc": "https://www.millingandmillers.com/wp-content/uploads/2023/05/Heatflow-01.jpg",
+    "alt": "Sponsored industry advertisement"
+  },
+  "newsMid": {
+    "href": "https://millingandmillers.com",
+    "imageSrc": "https://millingandmillers.com/wp-content/uploads/2023/05/Indiana-Automation-ad.jpg",
+    "alt": "Sponsored mid-feed advertisement"
+  },
+  "whatsapp": {
+    "href": "https://web.whatsapp.com/send?phone=919216299124&text=Hello%20Milling%20and%20Millers%20Team%2C%20I%20would%20like%20to%20inquire%20about%20advertising%20opportunities.%20Please%20let%20me%20know%20the%20details.%0AThank%20you!",
+    "alt": "Chat on WhatsApp"
+  }
+}

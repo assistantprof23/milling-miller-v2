@@ -1,0 +1,35 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { getPolicies } from "../data/policies.js";
+const policiesList = getPolicies(); // default: greatest-id-first
+
+const title = 'Policies';
+---
+<MainLayout title={title}>
+  <section class="py-12">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-semibold">{title}</h1>
+        <p class="text-sm text-muted">Official policy documents (PDF)</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {policiesList.map(policy => (
+          <article class="card p-5 flex flex-col justify-between">
+            <div>
+              <h2 class="text-lg font-medium">{policy.title}</h2>
+              <p class="mt-2 text-sm text-muted">Published: <span class="text-muted">{policy.date}</span></p>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between">
+              <a class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500" href={policy.file} target="_blank" rel="noopener noreferrer">View PDF</a>
+              <a class="text-sm text-muted hover:underline" href={policy.file} download>Download</a>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <p class="mt-6 text-sm text-muted">Note: place real PDF files at /public/policies/policy-1.pdf ... policy-4.pdf to serve them from this site.</p>
+    </div>
+  </section>
+</MainLayout>

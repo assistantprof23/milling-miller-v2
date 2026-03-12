@@ -1,0 +1,13 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppStickyButton from "../components/WhatsAppStickyButton.astro";
+export let title = "Milling & Millers";
+---
+<BaseLayout title={title}>
+	<Header />
+	<slot />
+	<Footer />
+	<WhatsAppStickyButton />
+</BaseLayout>
