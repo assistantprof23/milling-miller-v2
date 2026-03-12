@@ -10,6 +10,9 @@ const releases = (await getCollection('press-releases'))
   .filter((release) => /^\d+\.md$/.test(release.id))
   .sort((a, b) => extractFileNumber(b.id) - extractFileNumber(a.id))
   .slice(0, 3);
+
+const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
+const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
 ---
 
 <section class="py-12 bg-gray-900 text-white">
@@ -19,12 +22,12 @@ const releases = (await getCollection('press-releases'))
         <h2 class="text-2xl sm:text-3xl font-semibold">Press Releases</h2>
         <p class="text-sm text-gray-400 mt-1">Official announcements and company updates.</p>
       </div>
-      <a href="/press-releases" class="text-sm text-indigo-300 hover:underline">View all</a>
+      <a href={withBase('/press-releases')} class="text-sm text-indigo-300 hover:underline">View all</a>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {releases.map((release) => (
-        <a href={`/press-releases/${release.id.replace(/\.md$/, '')}`} class="block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden hover:bg-gray-750 transition">
+        <a href={withBase(`/press-releases/${release.id.replace(/\.md$/, '')}`)} class="block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden hover:bg-gray-750 transition">
           {release.data.cardImage && (
             <img src={release.data.cardImage} alt={release.data.title} class="w-full h-48 object-cover" loading="lazy" />
           )}

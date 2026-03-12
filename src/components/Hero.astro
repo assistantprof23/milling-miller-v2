@@ -1,5 +1,8 @@
 ---
 import ads from "../data/ads.json";
+
+const baseUrl = (import.meta as any).env?.BASE_URL ?? "/";
+const withBase = (path) => `${baseUrl}${path.replace(/^\//, "")}`;
 ---
 
 <section class="relative isolate overflow-hidden bg-[#eef4ea]">
@@ -16,8 +19,8 @@ import ads from "../data/ads.json";
       </p>
 
       <div class="hero-reveal hero-delay-2 mt-7 flex flex-wrap gap-3">
-        <a href="/machinery" class="hero-cta-primary">Explore Machinery</a>
-        <a href="/events" class="hero-cta-secondary">See Upcoming Events</a>
+        <a href={withBase("/machinery")} class="hero-cta-primary">Explore Machinery</a>
+        <a href={withBase("/events")} class="hero-cta-secondary">See Upcoming Events</a>
       </div>
 
       
