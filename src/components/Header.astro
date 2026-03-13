@@ -4,7 +4,13 @@ import "../styles/global.css";
 import ads from "../data/ads.json";
 
 const baseUrl = (import.meta as any).env?.BASE_URL ?? "/";
-const withBase = (path) => `${baseUrl}${path.replace(/^\//, "")}`;
+const withBase = (path) => {
+  const base = String(baseUrl).endsWith("/")
+    ? String(baseUrl)
+    : `${String(baseUrl)}/`;
+  const clean = String(path).replace(/^\//, "");
+  return `${base}${clean}`;
+};
 ---
 
 <header id="site-header" class="site-header bg-gray-900 text-white">
