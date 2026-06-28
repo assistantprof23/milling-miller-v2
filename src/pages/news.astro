@@ -2,9 +2,23 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import AdBanner from "../components/AdBanner.astro";
 import ads from "../data/ads.json";
-import { newsPosts } from "../data/news.js";
+import { getCollection } from "astro:content";
 
-const middleInsertIndex = Math.max(0, Math.floor(newsPosts.length / 2) - 1);
+const allPosts = (await getCollection("news")).sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+);
+
+// Shape posts for client-side script (only serialisable data)
+const postsForScript = allPosts.map((p) => ({
+  slug: p.id.replace(/\.md$/, ""),
+  title: p.data.title,
+  type: p.data.type,
+  image: p.data.image ?? null,
+}));
+
+const middleInsertIndex = Math.max(0, Math.floor(postsForScript.length / 2) - 1);
+const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
+const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
 ---
 <MainLayout>
   <main class="bg-gray-900 text-white max-w-3xl md:max-w-7xl mx-auto px-4 sm:px-6 py-4">
@@ -12,7 +26,6 @@ const middleInsertIndex = Math.max(0, Math.floor(newsPosts.length / 2) - 1);
       
       <!-- Filter Buttons -->
       <div class="mb-6">
-        <!-- horizontal scroll on small screens, inline on larger -->
         <div class="flex gap-2 sm:gap-3 overflow-x-auto pb-1 -mx-2 sm:mx-0 px-2 sm:px-0">
           <button id="all" class="whitespace-nowrap bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">All</button>
           <button id="rice" class="whitespace-nowrap bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">Rice</button>
@@ -32,10 +45,10 @@ const middleInsertIndex = Math.max(0, Math.floor(newsPosts.length / 2) - 1);
       
       <!-- News Posts Container -->
       <div id="news-container" class="columns-1 md:columns-2 lg:columns-3 gap-4">
-        {newsPosts.map((post, idx) => {
+        {postsForScript.map((post, idx) => {
           return (
             <>
-              <a href={`/news/${post.slug}`} rel="noopener noreferrer" class="block mb-4 break-inside-avoid">
+              <a href={withBase(`/news/${post.slug}`)} rel="noopener noreferrer" class="block mb-4 break-inside-avoid">
                 <article class="relative bg-gray-800 rounded shadow hover:bg-gray-700 transition overflow-hidden">
                   {post.image && <img src={post.image} alt={post.title} class="w-full h-48 sm:h-56 object-cover" />}
                   <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4">
@@ -45,7 +58,7 @@ const middleInsertIndex = Math.max(0, Math.floor(newsPosts.length / 2) - 1);
                 </article>
               </a>
 
-              {newsPosts.length >= 4 && idx === middleInsertIndex && (
+              {postsForScript.length >= 4 && idx === middleInsertIndex && (
                 <div class="block mb-4 break-inside-avoid">
                   <AdBanner
                     href={ads.newsMid.href}
@@ -60,8 +73,7 @@ const middleInsertIndex = Math.max(0, Math.floor(newsPosts.length / 2) - 1);
       </div>
   </main>
 
-  <script define:vars={{ allPosts: newsPosts, newsMidAd: ads.newsMid }}>
-    // Client-side filtering
+  <script define:vars={{ allPosts: postsForScript, newsMidAd: ads.newsMid, baseUrl }}>
     document.addEventListener('DOMContentLoaded', () => {
       const buttons = document.querySelectorAll('button[id]');
       const container = document.getElementById('news-container');
@@ -72,7 +84,7 @@ const middleInsertIndex = Math.max(0, Math.floor(newsPosts.length / 2) - 1);
 
         return posts.map((post, idx) => {
           const card = `
-            <a href="/news/${post.slug}" rel="noopener noreferrer" class="block mb-4 break-inside-avoid">
+            <a href="${baseUrl}news/${post.slug}" rel="noopener noreferrer" class="block mb-4 break-inside-avoid">
               <article class="relative bg-gray-800 rounded shadow hover:bg-gray-700 transition overflow-hidden">
                 ${post.image ? `<img src="${post.image}" alt="${post.title}" class="w-full h-48 sm:h-56 object-cover" />` : ''}
                 <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-4">

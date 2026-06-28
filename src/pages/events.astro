@@ -1,7 +1,24 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import EventsGrid from '../components/EventsGrid.astro';
-import { events } from "../data/events.js";
+import { getCollection } from "astro:content";
+
+const eventsData = (await getCollection("events")).sort(
+  (a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf()
+);
+
+// Shape into plain objects that EventsGrid already expects
+const events = eventsData.map((e) => ({
+  id: e.id,
+  title: e.data.title,
+  date: e.data.date,
+  time: e.data.time,
+  location: e.data.location,
+  organizer: e.data.organizer,
+  image: e.data.image ?? null,
+  description: e.data.description,
+  link: e.data.link ?? '#',
+}));
 ---
 <MainLayout>
   <main class="bg-[#0b1221] text-white">

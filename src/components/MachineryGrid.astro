@@ -1,12 +1,25 @@
 ---
-import { machineryItems } from "../data/machinery.js";
+import { getCollection } from "astro:content";
 const { catalogOnly = false } = Astro.props;
 const fallbackImage = "https://www.millingandmillers.com/wp-content/uploads/2023/05/Indiana-Automation-04.jpg";
 const dummyImage = fallbackImage;
+
+const collection = await getCollection("machinery");
+const machineryItems = collection.map((item) => ({
+  id: item.id,
+  title: item.data.title,
+  description: item.data.description,
+  vendor: item.data.vendor,
+  price: item.data.price,
+  location: item.data.location,
+  contact: item.data.contact,
+  image: item.data.image ?? null,
+  link: item.data.link ?? '#',
+}));
 ---
 <section class="bg-gray-900 py-12">
   <div class="max-w-7xl mx-auto px-6">
-    <h2 class="text-3xl font-semibold text-white mb-6">Featured Machinery</h2>
+    <h2 class="text-3xl font-semibold text-white mb-6">Featured Companies</h2>
 
     <!-- Tabs (hidden when rendering catalog-only) -->
     { !catalogOnly && (

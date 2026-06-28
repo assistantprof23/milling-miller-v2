@@ -1,32 +1,49 @@
 ---
 import MainLayout from "../../layouts/MainLayout.astro";
-import { newsPosts } from "../../data/news.js";
+import { getCollection } from "astro:content";
+import ads from "../../data/ads.json";
 
 export async function getStaticPaths() {
-  return newsPosts.map((post) => ({
-    params: { slug: post.slug },
+  const posts = await getCollection("news");
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/\.md$/, "") },
+    props: { post },
   }));
 }
 
-// Use Astro.params to resolve the post for this page
-const { slug } = Astro.params;
-const post = newsPosts.find((p) => p.slug === slug);
+const { post } = Astro.props;
+const { Content } = await post.render();
 ---
 <MainLayout>
-  <main class="bg-gray-900 text-white max-w-4xl mx-auto p-4">
-    {post ? (
-      <>
-        <h1 class="text-4xl font-bold mb-4">{post.title}</h1>
-        {post.image && <img src={post.image} alt={post.title} class="w-full h-auto object-cover mb-4 rounded" />}
-        <div class="prose prose-invert max-w-none">
-          <p>{post.content}</p>
-        </div>
-      </>
-    ) : (
-      <div class="text-center py-20">
-        <h1 class="text-3xl font-bold mb-2">404 — Not found</h1>
-        <p class="text-gray-300">We couldn't find that article.</p>
+  <main class="bg-gray-900 text-white max-w-7xl mx-auto p-4">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <article class="md:col-span-2">
+          <h1 class="text-4xl font-bold mb-4">{post.data.title}</h1>
+          {post.data.image && <img src={post.data.image} alt={post.data.title} class="w-full h-auto object-cover mb-4 rounded" />}
+          <div class="prose prose-invert max-w-none">
+            <Content />
+          </div>
+        </article>
+
+        <!-- Right column: show ads on desktop, stack below on mobile -->
+        <aside class="md:col-span-1 md:block">
+          <div class="hidden md:block space-y-6">
+            <a href={ads.newsDetail1.href} target="_blank" rel="noopener noreferrer" aria-label={ads.newsDetail1.alt} class="block">
+              <img src={ads.newsDetail1.imageSrc} alt={ads.newsDetail1.alt} class="w-full h-auto object-contain rounded" />
+            </a>
+            <a href={ads.newsDetail2.href} target="_blank" rel="noopener noreferrer" aria-label={ads.newsDetail2.alt} class="block">
+              <img src={ads.newsDetail2.imageSrc} alt={ads.newsDetail2.alt} class="w-full h-auto object-contain rounded" />
+            </a>
+          </div>
+          <div class="md:hidden mt-6 space-y-6">
+            <a href={ads.newsDetail1.href} target="_blank" rel="noopener noreferrer" aria-label={ads.newsDetail1.alt} class="block">
+              <img src={ads.newsDetail1.imageSrc} alt={ads.newsDetail1.alt} class="w-full h-auto object-contain rounded" />
+            </a>
+            <a href={ads.newsDetail2.href} target="_blank" rel="noopener noreferrer" aria-label={ads.newsDetail2.alt} class="block">
+              <img src={ads.newsDetail2.imageSrc} alt={ads.newsDetail2.alt} class="w-full h-auto object-contain rounded" />
+            </a>
+          </div>
+        </aside>
       </div>
-    )}
   </main>
 </MainLayout>

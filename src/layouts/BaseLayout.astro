@@ -1,12 +1,15 @@
 ---
 import '../styles/global.css';
-export let title = 'Milling and Miller';
+export let title = 'Site';
+const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
+const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
 ---
 <html lang="en" class="theme">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{title}</title>
+    <link rel="icon" type="image/png" href={withBase('/logo.png')} />
     <!-- ...existing head content... -->
     <!-- preconnect fonts for faster load -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

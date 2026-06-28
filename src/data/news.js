@@ -3,7 +3,7 @@ export const newsPosts = [
     title: "Advancements in Rice Milling Technology",
     type: "Rice",
     image: "https://www.millingandmillers.com/wp-content/uploads/2023/06/wheat-in-market.jpg",
-    content: "Rice milling technology has seen significant advancements in recent years, revolutionizing the way rice is processed globally. ...",
+    content: "Rice milling technology has seen significant advancements in recent years, revolutionizing the way rice is processed globally. ... \n Rice milling technology has seen significant advancements in recent years, revolutionizing the way rice is processed globally. ... ",
     slug: "advancements-rice-milling-technology",
     seq: 1
   },

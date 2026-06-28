@@ -1,7 +1,10 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
-import { getPolicies } from "../data/policies.js";
-const policiesList = getPolicies(); // default: greatest-id-first
+import { getCollection } from "astro:content";
+
+const policiesList = (await getCollection("policies")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
 
 const title = 'Policies';
 ---
@@ -17,13 +20,13 @@ const title = 'Policies';
         {policiesList.map(policy => (
           <article class="card p-5 flex flex-col justify-between">
             <div>
-              <h2 class="text-lg font-medium">{policy.title}</h2>
-              <p class="mt-2 text-sm text-muted">Published: <span class="text-muted">{policy.date}</span></p>
+              <h2 class="text-lg font-medium">{policy.data.title}</h2>
+              <p class="mt-2 text-sm text-muted">Published: <span class="text-muted">{policy.data.date.toLocaleDateString()}</span></p>
             </div>
 
             <div class="mt-4 flex items-center justify-between">
-              <a class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500" href={policy.file} target="_blank" rel="noopener noreferrer">View PDF</a>
-              <a class="text-sm text-muted hover:underline" href={policy.file} download>Download</a>
+              <a class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500" href={policy.data.file} target="_blank" rel="noopener noreferrer">View PDF</a>
+              <a class="text-sm text-muted hover:underline" href={policy.data.file} download>Download</a>
             </div>
           </article>
         ))}

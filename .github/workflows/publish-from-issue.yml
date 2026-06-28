@@ -1,0 +1,308 @@
+name: Publish Content from Issue
+
+on:
+  issues:
+    types: [opened, labeled]
+
+# Only run when the "publish" label is present
+jobs:
+  publish:
+    if: contains(github.event.issue.labels.*.name, 'publish')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # push the new .md file
+      issues: write     # comment on and close the issue
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Parse issue and create content file
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            const body = issue.body ?? '';
+
+            // Detect content type from label
+            let contentType = null;
+            if (labels.includes('type:news'))      contentType = 'news';
+            if (labels.includes('type:event'))     contentType = 'events';
+            if (labels.includes('type:machinery')) contentType = 'machinery';
+            if (labels.includes('type:policy'))    contentType = 'policies';
+            if (labels.includes('type:ad'))        contentType = 'ad';
+
+            if (!contentType) {
+              core.setOutput('skip', 'true');
+              return;
+            }
+
+            // GitHub Issue Forms produce sections like:
+            //   ### Field Label
+            //   value
+            function parseField(body, label) {
+              const regex = new RegExp(`###\\s+${label}\\s*\\n([\\s\\S]*?)(?=\\n###|$)`, 'i');
+              const match = body.match(regex);
+              return match ? match[1].trim() : '';
+            }
+
+            // Slugify title: lowercase, replace non-alphanumeric with dash, trim dashes
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // remove accents
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .substring(0, 80);
+            }
+
+            const fs = require('fs');
+            const path = require('path');
+
+            // ── NEWS ─────────────────────────────────────────────────────────────
+            if (contentType === 'news') {
+              const title    = parseField(body, 'Article Title');
+              const category = parseField(body, 'Category');
+              const image    = parseField(body, 'Image URL');
+              const summary  = parseField(body, 'Summary \\(1–2 sentences\\)');
+              const articleBody = parseField(body, 'Article Body');
+
+              if (!title) { core.setFailed('Missing required field: Article Title'); return; }
+
+              const today = new Date().toISOString().split('T')[0];
+              let slug = slugify(title);
+              let filePath = `src/content/news/${slug}.md`;
+              if (fs.existsSync(filePath)) slug = `${slug}-${today}`;
+              filePath = `src/content/news/${slug}.md`;
+
+              const md = [
+                '---',
+                `title: ${JSON.stringify(title)}`,
+                `type: "${category || 'General'}"`,
+                image ? `image: ${JSON.stringify(image)}` : null,
+                `summary: ${JSON.stringify(summary)}`,
+                `publishDate: "${today}"`,
+                '---',
+                '',
+                articleBody,
+              ].filter(l => l !== null).join('\n');
+
+              fs.writeFileSync(filePath, md);
+              core.setOutput('file', filePath);
+              core.setOutput('title', title);
+              core.setOutput('slug', slug);
+              core.setOutput('type', 'news');
+            }
+
+            // ── EVENT ─────────────────────────────────────────────────────────────
+            if (contentType === 'events') {
+              const title       = parseField(body, 'Event Title');
+              const date        = parseField(body, 'Date');
+              const time        = parseField(body, 'Time');
+              const location    = parseField(body, 'Location');
+              const organizer   = parseField(body, 'Organizer');
+              const image       = parseField(body, 'Image URL \\(optional\\)');
+              const link        = parseField(body, 'Registration \\/ Event Link \\(optional\\)');
+              const description = parseField(body, 'Event Description');
+
+              if (!title) { core.setFailed('Missing required field: Event Title'); return; }
+
+              const today = new Date().toISOString().split('T')[0];
+              let slug = slugify(title);
+              let filePath = `src/content/events/${slug}.md`;
+              if (fs.existsSync(filePath)) slug = `${slug}-${today}`;
+              filePath = `src/content/events/${slug}.md`;
+
+              const md = [
+                '---',
+                `title: ${JSON.stringify(title)}`,
+                `date: "${date}"`,
+                `time: ${JSON.stringify(time)}`,
+                `location: ${JSON.stringify(location)}`,
+                `organizer: ${JSON.stringify(organizer)}`,
+                image ? `image: ${JSON.stringify(image)}` : null,
+                link ? `link: ${JSON.stringify(link)}` : null,
+                `description: ${JSON.stringify(description)}`,
+                '---',
+                '',
+                description,
+              ].filter(l => l !== null).join('\n');
+
+              fs.writeFileSync(filePath, md);
+              core.setOutput('file', filePath);
+              core.setOutput('title', title);
+              core.setOutput('slug', slug);
+              core.setOutput('type', 'events');
+            }
+
+            // ── MACHINERY ─────────────────────────────────────────────────────────
+            if (contentType === 'machinery') {
+              const title       = parseField(body, 'Machine \\/ Equipment Name');
+              const description = parseField(body, 'Description');
+              const vendor      = parseField(body, 'Vendor \\/ Seller Name');
+              const price       = parseField(body, 'Price');
+              const location    = parseField(body, 'Location');
+              const contact     = parseField(body, 'Contact \\(phone or email\\)');
+              const image       = parseField(body, 'Image URL \\(optional\\)');
+              const link        = parseField(body, 'Product \\/ Listing Link \\(optional\\)');
+
+              if (!title) { core.setFailed('Missing required field: Machine Name'); return; }
+
+              const today = new Date().toISOString().split('T')[0];
+              let slug = slugify(title);
+              let filePath = `src/content/machinery/${slug}.md`;
+              if (fs.existsSync(filePath)) slug = `${slug}-${today}`;
+              filePath = `src/content/machinery/${slug}.md`;
+
+              const md = [
+                '---',
+                `title: ${JSON.stringify(title)}`,
+                `description: ${JSON.stringify(description)}`,
+                `vendor: ${JSON.stringify(vendor)}`,
+                `price: ${JSON.stringify(price)}`,
+                `location: ${JSON.stringify(location)}`,
+                `contact: ${JSON.stringify(contact)}`,
+                image ? `image: ${JSON.stringify(image)}` : null,
+                link ? `link: ${JSON.stringify(link)}` : null,
+                '---',
+                '',
+                description,
+              ].filter(l => l !== null).join('\n');
+
+              fs.writeFileSync(filePath, md);
+              core.setOutput('file', filePath);
+              core.setOutput('title', title);
+              core.setOutput('slug', slug);
+              core.setOutput('type', 'machinery');
+            }
+
+            // ── POLICY ────────────────────────────────────────────────────────────
+            if (contentType === 'policies') {
+              const title = parseField(body, 'Policy \\/ Document Title');
+              const date  = parseField(body, 'Publication Date');
+              const file  = parseField(body, 'PDF URL');
+
+              if (!title) { core.setFailed('Missing required field: Policy Title'); return; }
+
+              const today = new Date().toISOString().split('T')[0];
+              let slug = slugify(title);
+              let filePath = `src/content/policies/${slug}.md`;
+              if (fs.existsSync(filePath)) slug = `${slug}-${today}`;
+              filePath = `src/content/policies/${slug}.md`;
+
+              const md = [
+                '---',
+                `title: ${JSON.stringify(title)}`,
+                `file: ${JSON.stringify(file)}`,
+                `date: "${date || today}"`,
+                '---',
+              ].join('\n');
+
+              fs.writeFileSync(filePath, md);
+              core.setOutput('file', filePath);
+              core.setOutput('title', title);
+              core.setOutput('slug', slug);
+              core.setOutput('type', 'policies');
+            }
+
+            // ── AD ────────────────────────────────────────────────────────────────
+            if (contentType === 'ad') {
+              // Dropdown value format: "slotKey — description"
+              const slotRaw  = parseField(body, 'Ad Slot');
+              const slot     = slotRaw.split(' — ')[0].trim();
+              const href     = parseField(body, 'Destination URL \\(where clicking the ad goes\\)');
+              const imageSrc = parseField(body, 'Ad Image URL');
+              const alt      = parseField(body, 'Image Description \\(for accessibility\\)');
+
+              const validSlots = ['header','hero','homeSectionBreak1','homeSectionBreak2',
+                                  'newsTop','newsMid','newsDetail1','newsDetail2'];
+              if (!validSlots.includes(slot)) {
+                core.setFailed(`Unknown ad slot: "${slot}". Valid: ${validSlots.join(', ')}`);
+                return;
+              }
+              if (!href || !imageSrc) {
+                core.setFailed('Missing required fields: Destination URL and Ad Image URL are required.');
+                return;
+              }
+
+              const adsPath = 'src/data/ads.json';
+              const ads = JSON.parse(fs.readFileSync(adsPath, 'utf8'));
+              ads[slot] = { href, imageSrc, alt: alt || `${slot} advertisement` };
+              fs.writeFileSync(adsPath, JSON.stringify(ads, null, 2) + '\n');
+
+              core.setOutput('file', adsPath);
+              core.setOutput('title', `${slot} ad slot`);
+              core.setOutput('slug', slot);
+              core.setOutput('type', 'ad');
+            }
+
+      - name: Commit and push content file
+        if: steps.parse.outputs.skip != 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ steps.parse.outputs.file }}"
+          git commit -m "content(${{ steps.parse.outputs.type }}): ${{ steps.parse.outputs.type == 'ad' && 'update' || 'add' }} ${{ steps.parse.outputs.title }} [via issue #${{ github.event.issue.number }}]"
+          git push
+
+      - name: Comment on issue with publish status
+        if: steps.parse.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const type  = '${{ steps.parse.outputs.type }}';
+            const slug  = '${{ steps.parse.outputs.slug }}';
+            const title = `${{ steps.parse.outputs.title }}`;
+
+            // Derive the live URL for the comment
+            const repoUrl = context.payload.repository.html_url;
+            const pagesBase = repoUrl
+              .replace('https://github.com/', 'https://')
+              .replace(/\/([^/]+)$/, '.github.io/$1');
+
+            let commentBody;
+            if (type === 'ad') {
+              commentBody = [
+                `✅ **Ad slot \`${slug}\` updated!** The site is rebuilding now.`,
+                ``,
+                `Allow ~2 minutes for the deploy to complete, then check the live site at:`,
+                `**${pagesBase}**`,
+                ``,
+                `*This issue will now be closed automatically.*`,
+              ].join('\n');
+            } else {
+              const pathMap = { news: `news/${slug}`, events: 'events', machinery: 'machinery', policies: 'policies' };
+              const livePath = pathMap[type] ?? type;
+              commentBody = [
+                `✅ **Published!** The content file has been committed and the site is rebuilding.`,
+                ``,
+                `Allow ~2 minutes for GitHub Actions to complete the deploy, then visit:`,
+                `**${pagesBase}/${livePath}**`,
+                ``,
+                `*This issue will now be closed automatically.*`,
+              ].join('\n');
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody,
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+            });

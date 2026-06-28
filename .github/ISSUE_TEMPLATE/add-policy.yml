@@ -1,0 +1,37 @@
+name: "Add Policy Document"
+description: "Add a new government policy or circular to the website"
+title: "[POLICY] "
+labels:
+  - publish
+  - "type:policy"
+body:
+  - type: input
+    id: title
+    attributes:
+      label: "Policy / Document Title"
+      placeholder: "e.g. Export Incentives Circular Q3 2026"
+    validations:
+      required: true
+
+  - type: input
+    id: date
+    attributes:
+      label: "Publication Date"
+      description: "Format: YYYY-MM-DD"
+      placeholder: "2026-07-01"
+    validations:
+      required: true
+
+  - type: input
+    id: file
+    attributes:
+      label: "PDF URL"
+      description: |
+        Upload your PDF to GitHub:
+        1. Drag the PDF into any GitHub comment box.
+        2. Copy the generated `https://github.com/user-attachments/...` link.
+        3. Paste it here.
+        You can also use an external URL (government website, etc.).
+      placeholder: "https://..."
+    validations:
+      required: true

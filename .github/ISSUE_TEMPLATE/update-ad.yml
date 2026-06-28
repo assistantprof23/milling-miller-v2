@@ -1,0 +1,52 @@
+name: "Update Advertisement Banner"
+description: "Change the image or link for an ad slot on the website"
+title: "[AD] "
+labels:
+  - publish
+  - "type:ad"
+body:
+  - type: dropdown
+    id: slot
+    attributes:
+      label: "Ad Slot"
+      description: "Which placement on the site do you want to update?"
+      options:
+        - "header — Banner inside the site header"
+        - "hero — Large banner on the homepage hero section"
+        - "homeSectionBreak1 — Between Machinery and Policy sections on homepage"
+        - "homeSectionBreak2 — Between Policy and Press Releases sections on homepage"
+        - "newsTop — Top of the News listing page"
+        - "newsMid — Mid-feed on the News listing page"
+        - "newsDetail1 — Right sidebar (top) on news article pages"
+        - "newsDetail2 — Right sidebar (bottom) on news article pages"
+    validations:
+      required: true
+
+  - type: input
+    id: href
+    attributes:
+      label: "Destination URL (where clicking the ad goes)"
+      placeholder: "https://advertiser-website.com"
+    validations:
+      required: true
+
+  - type: input
+    id: imageSrc
+    attributes:
+      label: "Ad Image URL"
+      description: |
+        Paste the image URL here.
+        To upload your own image: drag and drop it into any GitHub comment box then copy the generated https://github.com/user-attachments/... link and paste it here.
+        Recommended size: 1200x300 px for banners, 400x300 px for sidebar ads.
+      placeholder: "https://..."
+    validations:
+      required: true
+
+  - type: input
+    id: alt
+    attributes:
+      label: "Image Description (for accessibility)"
+      description: "Describe what the ad shows. e.g. Indiana Automation - FRK Blending Machine"
+      placeholder: "Advertiser name and product"
+    validations:
+      required: true

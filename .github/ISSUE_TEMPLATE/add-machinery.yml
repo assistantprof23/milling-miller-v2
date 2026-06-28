@@ -1,0 +1,72 @@
+name: "Add Machinery Listing"
+description: "Add a new machine or equipment listing to the website"
+title: "[MACHINERY] "
+labels:
+  - publish
+  - "type:machinery"
+body:
+  - type: input
+    id: title
+    attributes:
+      label: "Machine / Equipment Name"
+      placeholder: "e.g. FRK Blending Machine Mark II"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      placeholder: "Describe the machine, its features and suitability."
+    validations:
+      required: true
+
+  - type: input
+    id: vendor
+    attributes:
+      label: "Vendor / Seller Name"
+      placeholder: "Indiana Automation"
+    validations:
+      required: true
+
+  - type: input
+    id: price
+    attributes:
+      label: "Price"
+      placeholder: "₹1,20,000"
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: "Location"
+      placeholder: "3811 Airport Road, New Delhi"
+    validations:
+      required: true
+
+  - type: input
+    id: contact
+    attributes:
+      label: "Contact (phone or email)"
+      placeholder: "+91 9876543210"
+    validations:
+      required: true
+
+  - type: input
+    id: image
+    attributes:
+      label: "Image URL (optional)"
+      description: |
+        To upload an image: drag it into any GitHub comment → copy the generated link → paste here.
+      placeholder: "https://..."
+    validations:
+      required: false
+
+  - type: input
+    id: link
+    attributes:
+      label: "Product / Listing Link (optional)"
+      placeholder: "https://..."
+    validations:
+      required: false
