@@ -3,11 +3,17 @@ name: Publish Content from Issue
 on:
   issues:
     types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to publish (must have the "publish" label)'
+        required: true
+        type: number
 
 # Only run when the "publish" label is present
 jobs:
   publish:
-    if: contains(github.event.issue.labels.*.name, 'publish')
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.issue.labels.*.name, 'publish')
     runs-on: ubuntu-latest
 
     permissions:
@@ -30,8 +36,23 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const issue = context.payload.issue;
+            let issue;
+            if (context.eventName === 'workflow_dispatch') {
+              const issueNumber = parseInt(context.payload.inputs.issue_number, 10);
+              const { data } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+              });
+              issue = data;
+            } else {
+              issue = context.payload.issue;
+            }
             const labels = issue.labels.map(l => l.name);
+            if (!labels.includes('publish')) {
+              core.setFailed(`Issue #${issue.number} does not have the "publish" label.`);
+              return;
+            }
             const body = issue.body ?? '';
 
             // Detect content type from label

@@ -1,0 +1,139 @@
+name: Create Astro Page
+
+on:
+  workflow_dispatch:
+    inputs:
+      page_slug:
+        description: 'URL path for the page (e.g. "about" → /about). Lowercase, hyphens only.'
+        required: true
+        type: string
+      page_title:
+        description: 'Page title shown in the <h1> and browser tab'
+        required: true
+        type: string
+      page_description:
+        description: 'Short description shown below the title (optional)'
+        required: false
+        type: string
+        default: ''
+      page_type:
+        description: 'Page template'
+        required: true
+        type: choice
+        default: basic
+        options:
+          - basic          # Simple content page (like Contact)
+          - content-list   # Filtered card-grid page (like News / Events)
+
+permissions:
+  contents: write
+
+jobs:
+  create-page:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Scaffold Astro page
+        uses: actions/github-script@v7
+        env:
+          PAGE_SLUG: ${{ inputs.page_slug }}
+          PAGE_TITLE: ${{ inputs.page_title }}
+          PAGE_DESCRIPTION: ${{ inputs.page_description }}
+          PAGE_TYPE: ${{ inputs.page_type }}
+        with:
+          script: |
+            const fs   = require('fs');
+            const path = require('path');
+
+            // ── Sanitise inputs ───────────────────────────────────────────────
+            const rawSlug   = process.env.PAGE_SLUG.trim();
+            const title     = process.env.PAGE_TITLE.trim();
+            const desc      = process.env.PAGE_DESCRIPTION.trim();
+            const pageType  = process.env.PAGE_TYPE.trim();
+
+            const slug = rawSlug
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-+|-+$/g, '');
+
+            if (!slug) core.setFailed('page_slug is empty after sanitisation.');
+            if (!title) core.setFailed('page_title must not be empty.');
+
+            const filePath = `src/pages/${slug}.astro`;
+
+            if (fs.existsSync(filePath)) {
+              core.setFailed(`Page already exists: ${filePath}`);
+              return;
+            }
+
+            // ── Templates ─────────────────────────────────────────────────────
+
+            // Basic content page — mirrors contact.astro style
+            const basicTemplate = `---
+            import MainLayout from "../layouts/MainLayout.astro";
+            ---
+            <MainLayout>
+              <main class="bg-gray-900 text-white max-w-3xl md:max-w-7xl mx-auto px-4 sm:px-6 py-6">
+                <h1 class="text-2xl sm:text-3xl font-bold mb-4">${title}</h1>
+            ${desc ? `
+                <p class="text-gray-300 mb-6">${desc}</p>
+            ` : ''}
+                {/* TODO: Add page content here */}
+              </main>
+            </MainLayout>
+            `.replace(/^            /gm, '');   // strip leading indent from template literal
+
+            // Content-list page — mirrors news.astro / events.astro style
+            const contentListTemplate = `---
+            import MainLayout from "../layouts/MainLayout.astro";
+
+            // TODO: replace "news" below with the correct content collection name
+            // import { getCollection } from "astro:content";
+            // const items = await getCollection("news");
+            ---
+            <MainLayout>
+              <main class="bg-gray-900 text-white max-w-3xl md:max-w-7xl mx-auto px-4 sm:px-6 py-4">
+                <h1 class="text-3xl font-bold mb-4">${title}</h1>
+            ${desc ? `
+                <p class="text-gray-300 mb-6">${desc}</p>
+            ` : ''}
+                {/* Filter buttons */}
+                <div class="mb-6 flex gap-2 sm:gap-3 overflow-x-auto pb-1">
+                  <button class="whitespace-nowrap bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">All</button>
+                </div>
+
+                {/* Card grid */}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* TODO: map over items here */}
+                </div>
+              </main>
+            </MainLayout>
+            `.replace(/^            /gm, '');
+
+            const content = pageType === 'content-list' ? contentListTemplate : basicTemplate;
+
+            fs.writeFileSync(filePath, content, 'utf8');
+            core.info(`Created ${filePath}`);
+            core.setOutput('file', filePath);
+            core.setOutput('title', title);
+            core.setOutput('slug', slug);
+
+      - name: Commit and push new page
+        env:
+          PAGE_SLUG: ${{ inputs.page_slug }}
+          PAGE_TITLE: ${{ inputs.page_title }}
+        run: |
+          SLUG=$(echo "$PAGE_SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/^-\+//;s/-\+$//')
+          FILE="src/pages/${SLUG}.astro"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "$FILE"
+          git commit -m "feat(pages): add /${SLUG} page — ${PAGE_TITLE}"
+          git push origin HEAD:main
