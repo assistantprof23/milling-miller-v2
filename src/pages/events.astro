@@ -2,6 +2,7 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import EventsGrid from '../components/EventsGrid.astro';
 import { getCollection } from "astro:content";
+import { safeLink } from "../utils/url";
 
 const eventsData = (await getCollection("events")).sort(
   (a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf()
@@ -17,7 +18,7 @@ const events = eventsData.map((e) => ({
   organizer: e.data.organizer,
   image: e.data.image ?? null,
   description: e.data.description,
-  link: e.data.link ?? '#',
+  link: safeLink(e.data.link),
 }));
 ---
 <MainLayout>

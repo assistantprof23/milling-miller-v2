@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
 export let title = 'Site';
-const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
+const rawBase = String((import.meta as any).env?.BASE_URL ?? "/");
+const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
 ---
 <html lang="en" class="theme">

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { withBase } from "../utils/url";
 const { catalogOnly = false } = Astro.props;
 const fallbackImage = "https://www.millingandmillers.com/wp-content/uploads/2023/05/Indiana-Automation-04.jpg";
 const dummyImage = fallbackImage;
@@ -13,7 +14,7 @@ const machineryItems = collection.map((item) => ({
   price: item.data.price,
   location: item.data.location,
   contact: item.data.contact,
-  image: item.data.image ?? null,
+  image: item.data.image ? withBase(item.data.image) : null,
   link: item.data.link ?? '#',
 }));
 ---

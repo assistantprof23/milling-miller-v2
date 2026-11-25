@@ -11,7 +11,8 @@ const releases = (await getCollection('press-releases'))
   .sort((a, b) => extractFileNumber(b.id) - extractFileNumber(a.id))
   .slice(0, 3);
 
-const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
+const rawBase = String((import.meta as any).env?.BASE_URL ?? "/");
+const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
 ---
 

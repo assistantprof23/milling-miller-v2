@@ -1,7 +1,9 @@
 ---
 import { getCollection } from "astro:content";
+import { safeLink } from "../utils/url";
 
-const baseUrl = (import.meta as any).env?.BASE_URL ?? "/";
+const rawBase = String((import.meta as any).env?.BASE_URL ?? "/");
+const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 const withBase = (path) => `${baseUrl}${path.replace(/^\//, "")}`;
 
 const upcomingEvents = (await getCollection("events"))
@@ -41,7 +43,7 @@ const upcomingEvents = (await getCollection("events"))
 
               <div class="mt-4 flex items-center justify-between">
                 <div class="text-sm text-gray-400">{ev.data.organizer}</div>
-                <a class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500" href={ev.data.link ?? '#'}>Register</a>
+                <a class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500" href={safeLink(ev.data.link)}>Register</a>
               </div>
             </div>
           </article>

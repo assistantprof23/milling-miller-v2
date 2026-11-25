@@ -17,7 +17,8 @@ const postsForScript = allPosts.map((p) => ({
 }));
 
 const middleInsertIndex = Math.max(0, Math.floor(postsForScript.length / 2) - 1);
-const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
+const rawBase = String((import.meta as any).env?.BASE_URL ?? "/");
+const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
 ---
 <MainLayout>

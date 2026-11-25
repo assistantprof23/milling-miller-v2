@@ -1,7 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import styles from '../styles/Home.module.css';
-const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
+const rawBase = String((import.meta as any).env?.BASE_URL ?? "/");
+const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
 
 const allPosts = (await getCollection('news')).sort(
