@@ -11,11 +11,9 @@ const machineryItems = collection.map((item) => ({
   title: item.data.title,
   description: item.data.description,
   vendor: item.data.vendor,
-  price: item.data.price,
   location: item.data.location,
   contact: item.data.contact,
   image: item.data.image ? withBase(item.data.image) : null,
-  link: item.data.link ?? '#',
 }));
 ---
 <section class="bg-gray-900 py-12">
@@ -64,10 +62,13 @@ const machineryItems = collection.map((item) => ({
 
             <div class="mt-4 flex items-center justify-between">
               <div class="text-sm text-gray-400">{item.vendor}</div>
-              <div class="flex items-center gap-3">
-                <span class="text-sm font-semibold text-indigo-300">{item.price}</span>
-                <a class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400" href={item.link || '#'}>View</a>
-              </div>
+              <button
+                type="button"
+                class="view-image-btn inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                data-src={item.image || fallbackImage}
+                data-alt={item.title}
+                aria-haspopup="dialog"
+              >View</button>
             </div>
           </div>
         </article>
@@ -75,6 +76,43 @@ const machineryItems = collection.map((item) => ({
     </div>
   </div>
 </section>
+
+<dialog id="image-viewer" class="m-0 p-0 w-screen h-screen max-w-none max-h-none bg-black/95 text-white backdrop:bg-black">
+  <button
+    type="button"
+    id="image-viewer-close"
+    class="absolute top-4 right-4 z-10 w-11 h-11 inline-flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+    aria-label="Close image"
+  >
+    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+  </button>
+  <div id="image-viewer-backdrop" class="w-full h-full flex items-center justify-center p-4">
+    <img id="image-viewer-img" src="" alt="" class="max-w-full max-h-full object-contain" />
+  </div>
+</dialog>
+
+<script>
+  (function () {
+    const viewer = document.getElementById('image-viewer') as HTMLDialogElement | null;
+    const viewerImg = document.getElementById('image-viewer-img') as HTMLImageElement | null;
+    if (!viewer || !viewerImg) return;
+
+    document.querySelectorAll<HTMLButtonElement>('.view-image-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        viewerImg.src = btn.dataset.src ?? '';
+        viewerImg.alt = btn.dataset.alt ?? '';
+        viewer.showModal();
+      });
+    });
+
+    document.getElementById('image-viewer-close')?.addEventListener('click', () => viewer.close());
+    // Clicking outside the image closes the viewer
+    viewer.addEventListener('click', (e) => {
+      if (e.target === viewer || (e.target as HTMLElement).id === 'image-viewer-backdrop') viewer.close();
+    });
+    viewer.addEventListener('close', () => { viewerImg.src = ''; });
+  })();
+</script>
 
 <script>
   (function () {
