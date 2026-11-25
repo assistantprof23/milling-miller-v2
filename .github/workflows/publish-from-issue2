@@ -1,4 +1,4 @@
-name: Publish Content from Issue
+name: Publish Content from Issue 2
 
 on:
   issues:
