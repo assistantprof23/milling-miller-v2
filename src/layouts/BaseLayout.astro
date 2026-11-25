@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
-export let title = 'Site';
+const siteName = 'Milling and Miller';
+const { title } = Astro.props;
+const pageTitle = title && title !== siteName ? `${title} | ${siteName}` : siteName;
 const rawBase = String((import.meta as any).env?.BASE_URL ?? "/");
 const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
 const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
@@ -9,7 +11,7 @@ const withBase = (path) => `${baseUrl}${path.replace(/^\//, '')}`;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>{title}</title>
+    <title>{pageTitle}</title>
     <link rel="icon" type="image/png" href={withBase('/logo.png')} />
     <!-- ...existing head content... -->
     <!-- preconnect fonts for faster load -->
