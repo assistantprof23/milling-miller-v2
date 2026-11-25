@@ -11,6 +11,10 @@ const withBase = (path) => {
   const clean = String(path).replace(/^\//, "");
   return `${base}${clean}`;
 };
+
+const subscribeHref = `mailto:millingandmiller@gmail.com?subject=${encodeURIComponent(
+  "Subscription Request"
+)}&body=${encodeURIComponent("Please subscribe me to the newsletter")}`;
 ---
 
 <header id="site-header" class="site-header bg-gray-900 text-white">
@@ -39,6 +43,12 @@ const withBase = (path) => {
         <a href={withBase("/machinery")} class="hover:text-green-600">Marketplace</a>
         <a href={withBase("/events")} class="hover:text-green-600">Events</a>
         <a href={withBase("/contact")} class="hover:text-green-600">Contact</a>
+        <a
+          href={subscribeHref}
+          class="ml-auto shrink-0 inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-semibold rounded-md"
+        >
+          Subscribe to Newsletter
+        </a>
       </nav>
     </div>
 
