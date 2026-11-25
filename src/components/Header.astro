@@ -2,6 +2,7 @@
 /* Import global styles once in the shared header so client-side navigation keeps styles loaded */
 import "../styles/global.css";
 import ads from "../data/ads.json";
+import { subscribeHref } from "../utils/newsletter";
 
 const baseUrl = (import.meta as any).env?.BASE_URL ?? "/";
 const withBase = (path) => {
@@ -11,10 +12,6 @@ const withBase = (path) => {
   const clean = String(path).replace(/^\//, "");
   return `${base}${clean}`;
 };
-
-const subscribeHref = `mailto:millingandmiller@gmail.com?subject=${encodeURIComponent(
-  "Subscription Request"
-)}&body=${encodeURIComponent("Please subscribe me to the newsletter")}`;
 ---
 
 <header id="site-header" class="site-header bg-gray-900 text-white">

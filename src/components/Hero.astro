@@ -1,5 +1,6 @@
 ---
 import ads from "../data/ads.json";
+import { subscribeHref } from "../utils/newsletter";
 
 const rawBase = String((import.meta as any).env?.BASE_URL ?? "/");
 const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
@@ -22,6 +23,7 @@ const withBase = (path) => `${baseUrl}${path.replace(/^\//, "")}`;
       <div class="hero-reveal hero-delay-2 mt-7 flex flex-wrap gap-3">
         <a href={withBase("/machinery")} class="hero-cta-primary">Explore Marketplace</a>
         <a href={withBase("/events")} class="hero-cta-secondary">See Upcoming Events</a>
+        <a href={subscribeHref} class="hero-cta-ghost">Subscribe to Newsletter</a>
       </div>
 
       
@@ -71,7 +73,8 @@ const withBase = (path) => `${baseUrl}${path.replace(/^\//, "")}`;
     .hero-delay-3 { animation-delay: 320ms; }
 
     .hero-cta-primary,
-    .hero-cta-secondary {
+    .hero-cta-secondary,
+    .hero-cta-ghost {
       display: inline-flex;
       justify-content: center;
       align-items: center;
@@ -102,6 +105,17 @@ const withBase = (path) => `${baseUrl}${path.replace(/^\//, "")}`;
     .hero-cta-secondary:hover {
       transform: translateY(-2px);
       background: #f8fbf6;
+    }
+
+    .hero-cta-ghost {
+      border: 1px solid #1f6a33;
+      background: transparent;
+      color: #1f6a33;
+    }
+
+    .hero-cta-ghost:hover {
+      transform: translateY(-2px);
+      background: rgba(31, 106, 51, 0.08);
     }
 
     .stat-pill {
@@ -231,7 +245,8 @@ const withBase = (path) => `${baseUrl}${path.replace(/^\//, "")}`;
       }
 
       .hero-cta-primary,
-      .hero-cta-secondary {
+      .hero-cta-secondary,
+      .hero-cta-ghost {
         transition: none;
       }
     }
